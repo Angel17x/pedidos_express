@@ -1,46 +1,64 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pedidos_express/styles/color.dart';
+import 'package:pedidos_express/styles/text.dart';
+import 'dart:core';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onHorizontalDragUpdate: (updateDetails) {},
+      onTap: () => Future.value(false),
       child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Color.fromARGB(255, 255, 216, 42),
-            elevation: 0,
-            title: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 2),
-                        Text("Joe Larry", style: TextStyle(fontSize: 20)),
-                        Text("Inicio",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold)),
-                      ]),
-                  CircleAvatar(
-                    backgroundColor: Colors.black12,
-                    backgroundImage: AssetImage('assets/images/man.png'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          body: SingleChildScrollView(
+
+          body: SafeArea(
             child: Column(
               children: <Widget>[
-                SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: ColorUtil.secondary,
+                        borderRadius: BorderRadius.circular(30)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 2),
+                                MyText.p("Angel Lugo", "white", false),
+                                MyText.h2("Inicio", "primary", false)
+                              ]),
+                          InkWell(
+                            child: CircleAvatar(
+                              backgroundColor: Colors.black12,
+                              backgroundImage: AssetImage('assets/images/man.png'),
+                            ),
+                            onTap: () async {
+
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: Container(
@@ -51,9 +69,7 @@ class Home extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("Balance",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 30)),
+                              MyText.h4("Balance", "white", false),
                               Icon(
                                 Icons.wallet,
                                 size: 50,
@@ -71,31 +87,28 @@ class Home extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Total ventas",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 16)),
-                                  Text("Bs. 1,200.50",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 30)),
+                                  MyText.label("Total ventas","white", false),
+                                  MyText.h4("Bs. 1,200.50", "primary", true),
                                 ],
                               ),
-                              Text("+%20",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
+                              MyText.p("+%20", "primary", true),
                             ],
                           ),
                         ],
                       ),
                     ),
                     decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 126, 85, 251),
+                        color: ColorUtil.secondary,
                         borderRadius: BorderRadius.circular(30)),
                   ),
                 ),
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+
+                    ],
+                  ),
+                )
               ],
             ),
           )),

@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:pedidos_express/styles/color.dart';
 import 'package:pedidos_express/styles/text.dart';
-
+import 'package:pedidos_express/utils/routes_name.dart';
+import 'package:go_router/go_router.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -21,55 +23,35 @@ class _Login extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Image.asset("assets/icon/icon.png", width: 150, height: 150),
-                  MyText.h4("PEDIDOS EXPRESS", "primary", false)
-                ],
-              ),
-              Form(
-                  key: _formKey,
-                  child: Column(
+                  Column(
                     children: [
-                      Row(
+                      Image.asset("assets/icon/icon.png", width: 150, height: 150),
+                      MyText.h4("PEDIDOS EXPRESS", "primary", false)
+                    ],
+                  ),
+                  SizedBox(height: 40),
+                  Form(
+                      key: _formKey,
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
-                              child: TextFormField(
-                                validator: (value) => Validator.validate(value),
-                                cursorColor: Color.fromARGB(255, 255, 216, 42),
-                                cursorWidth: 5,
-                                decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                width: 0.2, color: Color.fromARGB(255, 187, 187, 187))),
-                                focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                width: 3, color: Color.fromARGB(255, 255, 216, 42))),
-                                border: OutlineInputBorder(),
-                                hintText: "email"),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
-                              child: TextFormField(
-                                validator: (value) => Validator.validate(value),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  validator: (value) => Validator.email(value),
                                   cursorColor: Color.fromARGB(255, 255, 216, 42),
                                   cursorWidth: 5,
                                   decoration: InputDecoration(
+                                    suffixIcon: Icon(Icons.email_outlined),
+                                    suffixIconColor: ColorUtil.gray,
                                     enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                     width: 0.2, color: Color.fromARGB(255, 187, 187, 187))),
@@ -77,34 +59,62 @@ class _Login extends State<Login> {
                                     borderSide: BorderSide(
                                     width: 3, color: Color.fromARGB(255, 255, 216, 42))),
                                     border: OutlineInputBorder(),
-                                    hintText: 'password')
+                                    hintText: "Correo electrónico",
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(child:
-                            ElevatedButton(
-                              style: ButtonStyle(
-                                elevation: 0
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  obscureText: true,
+                                  validator: (value) => Validator.password(value),
+                                    cursorColor: Color.fromARGB(255, 255, 216, 42),
+                                    cursorWidth: 5,
+                                    decoration: InputDecoration(
+                                      suffixIcon: Icon(Icons.lock_outline),
+                                      suffixIconColor: ColorUtil.gray,
+                                      enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                      width: 0.4, color: Color.fromARGB(255, 187, 187, 187))),
+                                      focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                      width: 3, color: Color.fromARGB(255, 255, 216, 42))),
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Contraseña',
+                                    )
+                                ),
                               ),
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Processing Data')),
-                                  );
-                                }
-                              },
-                              child: const Text('Submit'),
-                          ),)
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Expanded(child:
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    elevation: MaterialStateProperty.all(0),
+                                    padding: MaterialStateProperty.all(EdgeInsets.all(20)),
+                                    backgroundColor: MaterialStateProperty.all(ColorUtil.primary)
+                                  ),
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      context.goNamed(RoutesNames.home.name);
+                                    }
+                                  },
+                                  child: const Text('Iniciar sesión'),
+                              ),)
+                            ],
+                          )
                         ],
                       )
-                    ],
-                  )
-              )
-            ],
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       )
@@ -113,9 +123,15 @@ class _Login extends State<Login> {
 }
 
 class Validator{
-  static validate(value){
+  static password(value){
     if (value == null || value.isEmpty) {
-      return 'Please enter some text';
+      return 'la contraseña no puede estar vacía';
+    }
+    return null;
+  }
+  static email(value){
+    if (value == null || value.isEmpty) {
+      return 'Ingrese un correo electrónico válido';
     }
     return null;
   }

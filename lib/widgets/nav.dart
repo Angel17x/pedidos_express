@@ -57,8 +57,8 @@ class _NavState extends State<Nav> {
     return Scaffold(
         body: widget.child,
         bottomNavigationBar: CupertinoTabBar(
-            activeColor: ColorUtil.secondary,
-            backgroundColor: ColorUtil.primary,
+            activeColor: ColorUtil.primary,
+            backgroundColor: ColorUtil.secondary,
             inactiveColor: ColorUtil.gray,
             currentIndex: _currentIndex,
             items: tabs,

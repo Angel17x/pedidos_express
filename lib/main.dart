@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:pedidos_express/routes/routes.dart';
 import 'package:flutter/services.dart';
+import 'package:pedidos_express/styles/color.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(fontFamily: 'Montserrat'),
         debugShowCheckedModeBanner: false,
         home: AnimatedSplashScreen(
-          backgroundColor: Color.fromARGB(255, 255, 216, 42),
+          backgroundColor: ColorUtil.primary,
           splashIconSize: 400,
           duration: 1000,
           pageTransitionType: PageTransitionType.leftToRightWithFade,
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset("assets/icon/icon.png", height: 180, width: 180),
+              Lottie.asset('assets/lottie/order.json', width: 180, height: 180),
               SizedBox(height: 10),
               Text("PEDIDO EXPRESS",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))

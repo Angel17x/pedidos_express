@@ -20,6 +20,9 @@ class MyText {
   static Text p(String text, String color, bool fontWeight){
     return Text(text, style: TextStyle(fontSize: 16, color: MyText.getColor(color),fontWeight: fontWeight ? FontWeight.bold : FontWeight.normal));
   }
+  static Text label(String text, String color, bool fontWeight){
+    return Text(text, style: TextStyle(fontSize: 14, color: MyText.getColor(color),fontWeight: fontWeight ? FontWeight.bold : FontWeight.normal));
+  }
 
   static Color getColor(String color){
     switch(color){
@@ -29,6 +32,8 @@ class MyText {
         return ColorUtil.secondary;
       case 'gray':
         return ColorUtil.gray;
+      case 'white':
+        return Colors.white;
       default:
         return Colors.black45;
     }
