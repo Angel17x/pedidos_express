@@ -82,8 +82,25 @@ class _Login extends State<Login> {
                             ),
                           ),
                         ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(child:
+                            ElevatedButton(
+                              style: ButtonStyle(
+                                elevation: 0
+                              ),
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Processing Data')),
+                                  );
+                                }
+                              },
+                              child: const Text('Submit'),
+                          ),)
+                        ],
                       )
-
                     ],
                   )
               )
