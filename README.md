@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # pedidos_express
 
 Proyecto para pedidos
@@ -14,3 +15,6 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+# pedidos_express
+>>>>>>> f7cc7c7288a1b6c4fc6a6a40103b3841df77e097
