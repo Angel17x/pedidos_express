@@ -1,51 +1,78 @@
 import 'package:flutter/material.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:pedidos_express/pages/home.dart';
-import 'package:pedidos_express/pages/logout.dart';
-import 'package:pedidos_express/pages/user.dart';
+import 'package:logger/logger.dart';
+import 'package:pedidos_express/models/clients/clients_model.dart';
+import 'package:pedidos_express/models/user/user_model.dart';
+import 'package:pedidos_express/screens/init/init_bloc.dart';
+import 'package:pedidos_express/screens/login_screen/login_screen_bloc.dart';
+import 'package:pedidos_express/screens/products_screen/product_screen.dart';
+import 'package:pedidos_express/screens/register_screen/register_bloc.dart';
 import 'package:pedidos_express/utils/routes_name.dart';
-import '../pages/login.dart';
 import 'package:go_router/go_router.dart';
-
-import '../widgets/nav.dart';
+import '../screens/screens.dart';
+import '../widgets/bottom.dart';
 
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
-class Routes extends StatelessWidget {
-  const Routes({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: _router,
-    );
-  }
-}
 
-final GoRouter _router = GoRouter(
+final GoRouter router = GoRouter(
   initialLocation: RoutesNames.root.path,
   navigatorKey: _rootNavigatorKey,
   routes:[
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: RoutesNames.login.path,
-      name: RoutesNames.login.name,
-      builder: (BuildContext context, GoRouterState state) {
-        print(state.location);
-        return const Login();
-      }
-    ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
       path: RoutesNames.root.path,
       name: RoutesNames.root.name,
       redirect: (BuildContext context, GoRouterState state) {
         print(state.location);
-        return RoutesNames.home.path;
+        return RoutesNames.init.path;
       },
     ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: RoutesNames.init.path,
+      name: RoutesNames.init.name,
+      builder: (BuildContext context, GoRouterState state) {
+        print(state.location);
+        return InitScreen(bloc: InitBloc());
+      },
+      routes: [
+        GoRoute(
+            parentNavigatorKey: _rootNavigatorKey,
+            path: RoutesNames.login.path,
+            name: RoutesNames.login.name,
+            builder: (BuildContext context, GoRouterState state) {
+              print(state.location);
+              return LoginScreen(bloc: LoginScreenBloc());
+            }
+        ),
+        GoRoute(
+            parentNavigatorKey: _rootNavigatorKey,
+            path: RoutesNames.register.path,
+            name: RoutesNames.register.name,
+            builder: (BuildContext context, GoRouterState state) {
+              print(state.location);
+              return RegisterScreen(bloc: RegisterBloc());
+            },
+          routes: [
+            GoRoute(
+                parentNavigatorKey: _rootNavigatorKey,
+                path: RoutesNames.selectTypeUser.path,
+                name: RoutesNames.selectTypeUser.name,
+                builder: (BuildContext context, GoRouterState state) {
+                  print(state.location);
+                  var user = state.extra as UserModel;
+                  Logger().i(user.toJson());
+                  return SelectTypeUser(user: user);
+                }
+            ),
+          ]
+        ),
+
+      ]
+    ),
+
     ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) {
@@ -59,17 +86,49 @@ final GoRouter _router = GoRouter(
             name: RoutesNames.home.name,
             builder: (BuildContext context, GoRouterState state) {
               print(state.location);
-              return Home();
+              return HomeScreen();
             },
+            routes: [
+              GoRoute(
+                parentNavigatorKey: _shellNavigatorKey,
+                path: RoutesNames.products.path,
+                name: RoutesNames.products.name,
+                builder: (BuildContext context, GoRouterState state) {
+                  print(state.location);
+                  return ProductScreen();
+                },
+                routes: [
+                  GoRoute(
+                    parentNavigatorKey: _shellNavigatorKey,
+                    path: RoutesNames.products_view.path,
+                    name: RoutesNames.products_view.name,
+                    builder: (BuildContext context, GoRouterState state) {
+                      print(state.location);
+                      return ProductScreen();
+                    },
+                  ),
+                ]
+              ),
+            ]
           ),
           GoRoute(
             parentNavigatorKey: _shellNavigatorKey,
-            path: RoutesNames.user.path,
-            name: RoutesNames.user.name,
+            path: RoutesNames.briefcase.path,
+            name: RoutesNames.briefcase.name,
             builder: (BuildContext context, GoRouterState state) {
               print(state.location);
-              return UserScreen();
+              return BriefCaseScreen();
             },
+            routes: [
+              GoRoute(
+                  path: RoutesNames.client.path,
+                  name: RoutesNames.client.name,
+                  builder: (BuildContext context, GoRouterState state){
+                    print(state.location);
+                    var client = state.extra;
+                    return ClientScreen(client: client);
+                  })
+            ]
           ),
           GoRoute(
             parentNavigatorKey: _shellNavigatorKey,
@@ -78,6 +137,10 @@ final GoRouter _router = GoRouter(
             builder: (BuildContext context, GoRouterState state) {
               print(state.location);
               return LogoutScreen();
+            },
+            redirect: (BuildContext context, GoRouterState state) {
+              print(state.location);
+              return RoutesNames.init.path;
             },
           ),
         ]

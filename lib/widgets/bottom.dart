@@ -21,9 +21,9 @@ class _NavState extends State<Nav> {
         icon: const Icon(Icons.home),
         label: "Inicio"),
     ScaffoldWithNavBarTabItem(
-        initialLocation: RoutesNames.user.path,
-        icon: const Icon(Icons.person_outline),
-        label: "info"),
+        initialLocation: RoutesNames.briefcase.path,
+        icon: const Icon(Icons.wallet),
+        label: "Cartera de clientes"),
     ScaffoldWithNavBarTabItem(
         initialLocation: RoutesNames.logout.path,
         icon: const Icon(Icons.exit_to_app),
@@ -57,9 +57,9 @@ class _NavState extends State<Nav> {
     return Scaffold(
         body: widget.child,
         bottomNavigationBar: CupertinoTabBar(
-            activeColor: ColorUtil.primary,
-            backgroundColor: ColorUtil.secondary,
-            inactiveColor: ColorUtil.gray,
+            activeColor: Theme.of(context).primaryColor,
+            backgroundColor: Theme.of(context).cardColor,
+            inactiveColor: Theme.of(context).splashColor,
             currentIndex: _currentIndex,
             items: tabs,
             onTap: (index) => _onItemTapped(context, index)));

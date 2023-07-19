@@ -1,0 +1,10 @@
+{
+  "colors": {
+    "primary": "0xFFFF3E3E",
+    "primary_light": "0xFFFF7171",
+    "bg_light": "0xFFFFF2F2",
+    "secondary": "0xFF3F3F3F",
+    "error": "0xFF1818FF",
+    "success": "0x18FF74FF"
+  }
+}

@@ -1,5 +1,5 @@
 class Path{
   String name;
   String path;
-  Path(this.name, this.path);
+  Path({required this.name, required this.path});
 }
