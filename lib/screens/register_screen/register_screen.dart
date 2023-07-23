@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pedidos_express/models/user/user_model.dart';
 import 'package:pedidos_express/screens/register_screen/register_bloc.dart';
@@ -19,7 +20,14 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
 
-  Widget get _name => Column(
+   RegisterBloc get _bloc => widget.bloc;
+
+  @override
+  initState(){
+    super.initState();
+  }
+
+  Widget _name({ required bool isLoading }) => Column(
     children: [
       Material(
         borderRadius: BorderRadius.circular(25),
@@ -29,6 +37,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: [
             Expanded(
               child: TextFormField(
+                controller: _bloc.name,
+                validator: _bloc.validateName,
+                enabled: !isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 cursorWidth: 5,
                 decoration: InputDecoration(
@@ -44,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     ],
   );
 
-  Widget get _password => Column(
+  Widget _password({ required bool isLoading }) => Column(
     children: [
       Material(
         borderRadius: BorderRadius.circular(25),
@@ -54,6 +65,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: [
             Expanded(
               child: TextFormField(
+                controller: _bloc.password,
+                validator: _bloc.validatePassword,
+                enabled: !isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 cursorWidth: 5,
                 decoration: InputDecoration(
@@ -69,7 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     ],
   );
 
-  Widget get _email => Column(
+  Widget _email({ required bool isLoading }) => Column(
     children: [
       Material(
         borderRadius: BorderRadius.circular(25),
@@ -79,6 +93,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: [
             Expanded(
               child: TextFormField(
+                controller: _bloc.email,
+                validator: _bloc.validateEmail,
+                enabled: !isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 cursorWidth: 5,
                 decoration: InputDecoration(
@@ -94,7 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     ],
   );
 
-  Widget get _address =>
+  Widget _address({ required bool isLoading }) =>
         Material(
           borderRadius: BorderRadius.circular(25),
           elevation: 5,
@@ -103,9 +120,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               Expanded(
                 child: TextFormField(
-                  // onChanged: (text) => _bloc.updateUserName(text),
+                  controller: _bloc.address,
+                  validator: _bloc.validateAddress,
+                  enabled: !isLoading,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  // validator: (value) => snapshot.error?.toString(),
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(50),
                   ],
@@ -123,26 +141,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         );
 
-  Widget get _button => Row(
+  void _goLogin(){
+    context.goNamed(RoutesNames.login.name);
+  }
+
+  Widget _button({ required bool isLoading }) => Row(
     children: [
       Expanded(child:
       ElevatedButton(
         style: ButtonStyle(
+          backgroundColor: !isLoading ?
+          MaterialStatePropertyAll(Theme.of(context).primaryColor) :
+          MaterialStatePropertyAll(Colors.grey),
           elevation: MaterialStateProperty.all(0),
           padding: MaterialStateProperty.all(EdgeInsets.all(20)),
         ),
-        onPressed: () {
-          context.pushNamed(RoutesNames.selectTypeUser.name, extra: UserModel.fromJson(data: {
-            "name": "Angel Lugo",
-            "address": "Los Teques",
-            "email": "angel26078613@gmail.com",
-            "password": "Aelohack23.",
-          }));
-        },
-        child: const Text('Crear una cuenta'),
+        onPressed:  !isLoading ? _bloc.register : null,
+        child: isLoading ?
+        CircularProgressIndicator(color: Colors.white):
+        Text('Crear una cuenta'),
       ),)
     ],
   );
+
+   void _dialogError({String? errorMessage}){
+     showDialog(context: context, builder: (_) => AlertDialog(
+       title: Text("Error al registrar el usuario"),
+       content: Text(errorMessage ?? "", style: TextStyle(color: Colors.black45),),
+     ));
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -154,35 +181,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
           title: MyText.h6(context: context, text: "Crear cuenta", fontWeight: false, color: ""),
           centerTitle: true,
         ),
-        body: Padding(
-          padding: EdgeInsets.all(20),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(),
-                Column(children: [
-                  _name,
-                  SizedBox(height: 25),
-                  _address,
-                  SizedBox(height: 25),
-                  _email,
-                  SizedBox(height: 25),
-                  _password,
-                  SizedBox(height: 25),
-                  _button
-                ],),
-                Column(children: [
-                  SizedBox(height: 10),
-                  TextButtonTitleRef(
-                      title: '¿Ya eres usuario de la plataforma?',
-                      text: 'Inicia sesión',
-                      callback: () => context.goNamed(RoutesNames.register.name)
+        body: BlocConsumer<RegisterBloc, RegisterState>(
+          bloc: _bloc,
+          listener: (_, state){
+            if(state is RegisterScreenSuccessState){
+              _goLogin();
+            }
+            if(state is RegisterScreenErrorState){
+              _dialogError(errorMessage: state.errorMessage);
+            }
+          },
+          builder: (_, state){
+            bool isLoading = state is RegisterScreenLoadingState;
+
+            return Form(
+              key: _bloc.formKey,
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: SingleChildScrollView(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(),
+                          Column(children: [
+                            _name(isLoading: isLoading),
+                            SizedBox(height: 25),
+                            _address(isLoading: isLoading),
+                            SizedBox(height: 25),
+                            _email(isLoading: isLoading),
+                            SizedBox(height: 25),
+                            _password(isLoading: isLoading),
+                            SizedBox(height: 25),
+                            _button(isLoading: isLoading)
+                          ],),
+                          Column(children: [
+                            SizedBox(height: 10),
+                            TextButtonTitleRef(
+                                title: '¿Ya eres usuario de la plataforma?',
+                                text: 'Inicia sesión',
+                                callback: () => context.goNamed(RoutesNames.register.name)
+                            ),
+                            SizedBox(height: 20),
+                          ],)
+                        ]),
                   ),
-                  SizedBox(height: 20),
-                ],)
-            ]),
-          ),
+                ),
+              ),
+            );
+          },
         ),
       ));
   }

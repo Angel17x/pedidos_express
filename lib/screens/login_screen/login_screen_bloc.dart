@@ -77,7 +77,6 @@ class LoginScreenBloc extends Bloc<LoginScreenEvent, LoginScreenState> {
 
     add(LoginScreenLoadingEvent());
     final result = await _apiService.login(email: email, password: password);
-    _logger.i(result.toString());
 
     if(result.success){
       final isLogin = result.data ?? false;

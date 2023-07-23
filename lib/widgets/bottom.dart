@@ -20,10 +20,10 @@ class _NavState extends State<Nav> {
         initialLocation: RoutesNames.home.path,
         icon: const Icon(Icons.home),
         label: "Inicio"),
-    ScaffoldWithNavBarTabItem(
-        initialLocation: RoutesNames.briefcase.path,
-        icon: const Icon(Icons.wallet),
-        label: "Cartera de clientes"),
+    // ScaffoldWithNavBarTabItem(
+    //     initialLocation: RoutesNames.briefcase.path,
+    //     icon: const Icon(Icons.wallet),
+    //     label: "Cartera de clientes"),
     ScaffoldWithNavBarTabItem(
         initialLocation: RoutesNames.logout.path,
         icon: const Icon(Icons.exit_to_app),

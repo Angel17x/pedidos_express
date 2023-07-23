@@ -14,18 +14,43 @@ class AuthInterceptorRequest implements InterceptorContract {
         if(credentials?.token!=null){
           data.headers["Authorization"] = "bearer ${credentials?.token}";
         }
+        _logger.i('Request send to api: '
+            '|| Request method ${data.method} \n '
+            '|| request to ${data.url} '
+            '|| headers ${data.headers} \n '
+            '|| body: ${data.body} \n '
+            '|| queryParameters: ${data.params}');
+
     } catch (e) {
-      _logger.e(e);
+      _logger.e('Request send to api error: '
+          '|| Request method ${data.method} \n '
+          '|| Request to ${data.url} '
+          '|| Headers ${data.headers} \n '
+          '|| Body: ${data.body} \n '
+          '|| QueryParameters: ${data.params}'
+          '|| Error ----- ${e}');
     }
     return data;
   }
 
   @override
   Future<ResponseData> interceptResponse({required ResponseData data}) async {
-    if(data.statusCode == 401){
-
+    if(data.statusCode != 200){
+      _logger.e('Response api error: '
+          '|| Status Code ${data.statusCode} \n'
+          '|| Response method ${data.method} \n '
+          '|| Response url to ${data.url} '
+          '|| Headers ${data.headers} \n '
+          '|| Response body: ${data.body} \n ');
+    }else{
+      _logger.i('Response api: '
+          '|| Status Code ${data.statusCode} \n'
+          '|| Response method ${data.method} \n '
+          '|| Response url ${data.url} '
+          '|| Headers ${data.headers} \n '
+          '|| Response body: ${data.body} \n ');
     }
     return data;
   }
-
 }
+

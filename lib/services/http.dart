@@ -20,19 +20,10 @@ class ClientHttp {
   Future<Result<T>> get<T>({required String path, Map<String, String>? queryParams}) async {
     final url = Uri.parse('$_baseUrl/$path');
 
-    // Log antes de la petición
-    _logger.d('GET request to $url with headers: ${_headers()} and query params: $queryParams');
-
     try {
       final response = await _client.get(url, headers: _headers(),);
-
-      // Log después de la petición
-      _logger.d('GET request to $url returned response with status code: ${response.statusCode} and body: ${response.body}');
-
       return _parseResponse<T>(response);
     } catch (e) {
-      // Log en caso de error
-      _logger.e('GET request to $url failed with error: $e');
 
       return Result<T>(
         success: false,
@@ -48,19 +39,11 @@ class ClientHttp {
     final headers = _headers();
     final bodyJson = jsonEncode(body);
 
-    // Log antes de la petición
-    _logger.d('POST request to $url with headers: $headers and body: $bodyJson');
-
     try {
       final response = await _client.post(url, headers: headers, body: bodyJson);
 
-      // Log después de la petición
-      _logger.d('POST request to $url returned response with status code: ${response.statusCode} and body: ${response.body}');
-
       return _parseResponse<T>(response);
     } catch (e) {
-      // Log en caso de error
-      _logger.e('POST request to $url failed with error: $e');
 
       return Result<T>(
         success: false,
@@ -76,19 +59,11 @@ class ClientHttp {
     final headers = _headers();
     final bodyJson = jsonEncode(body);
 
-    // Log antes de la petición
-    _logger.d('PUT request to $url with headers: $headers and body: $bodyJson');
-
     try {
       final response = await _client.put(url, headers: headers, body: bodyJson);
-
-      // Log después de la petición
-      _logger.d('PUT request to $url returned response with status code: ${response.statusCode} and body: ${response.body}');
-
       return _parseResponse<T>(response);
+
     } catch (e) {
-      // Log en caso de error
-      _logger.e('PUT request to $url failed with error: $e');
 
       return Result<T>(
         success: false,
@@ -101,13 +76,8 @@ class ClientHttp {
   Future<Result<T>> delete<T>({required String path, Map<String, String>? queryParams}) async {
     final url = Uri.parse('$_baseUrl/$path');
 
-    // Log antes de la petición
-    _logger.d('DELETE request to $url with headers: ${_headers()} and query params: $queryParams');
-
     try {
       final response = await _client.delete(url, headers: _headers(),);
-
-      // Log después de la petición
       _logger.d('DELETE request to $url returned response with status code: ${response.statusCode} and body: ${response.body}');
 
       return _parseResponse<T>(response);
@@ -136,6 +106,18 @@ class ClientHttp {
           success: false,
           errorMessage: translate(name: 'Error: No response received from server'),
           data: null,
+        );
+      }
+      if(response.statusCode == 200 && (response.body == null || response.body == "")){
+          return Result<T>(
+            success: true,
+            data: {"data": "body_is_empty"} as T,
+        );
+      }
+        if(response.statusCode == 204 && (response.body == null || response.body == "")){
+          return Result<T>(
+            success: true,
+            data: {"data": "body_is_empty"} as T,
         );
       }
       final responseJson = jsonDecode(response.body);

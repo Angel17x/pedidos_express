@@ -1,6 +1,6 @@
 import 'package:ffcache/ffcache.dart';
 import 'package:logger/logger.dart';
-import 'domain/credentials.dart';
+import 'models/credentials.dart';
 
 class CacheServices {
   final _cache = new FFCache();
@@ -21,6 +21,14 @@ class CacheServices {
       return Credentials.fromJson(credentials);
     } catch (e) {
       return null;
+    }
+  }
+  Future<bool> deleteCredentials() async {
+    try {
+      await _cache.remove('credentials');
+      return true;
+    } catch (e){
+      return false;
     }
   }
 }

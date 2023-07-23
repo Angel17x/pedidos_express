@@ -1,16 +1,19 @@
+import 'dart:core';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pedidos_express/screens/home_screen/home_screen_bloc.dart';
 import 'package:pedidos_express/styles/text.dart';
 import 'package:pedidos_express/utils/routes_name.dart';
 import 'package:pedidos_express/widgets/default_appbar.dart';
-import 'dart:core';
-
+import '../../services/models/ecommerce_model.dart';
 import '../../utils/Exit_app_util.dart';
 import '../../widgets/WidgetOption.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final HomeScreenBloc bloc;
+  const HomeScreen({super.key, required this.bloc});
 
   @override
   State<HomeScreen> createState() => _HomeState();
@@ -18,12 +21,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeState extends State<HomeScreen> {
 
+  HomeScreenBloc get _bloc  => widget.bloc;
+
   @override
   void initState() {
+    _bloc.getEcommerce();
     super.initState();
   }
 
-  Widget get _header => Padding(
+  Widget _header({EcommerceModel? ecommerce}) => Padding(
     padding: const EdgeInsets.all(10),
     child: Container(
       decoration: BoxDecoration(
@@ -40,9 +46,9 @@ class _HomeState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 2),
-                  MyText.p(context: context, text: "Angel Lugo", color: "white"),
-                  MyText.h4(context: context, text: "Comercio express", color: "primary"),
-                  MyText.p(context: context, text: "Comercio", color: "primary"),
+                  MyText.p(context: context, text: ecommerce?.user_id?[0]?.name ?? "", color: "white"),
+                  MyText.h4(context: context, text: ecommerce?.name ?? "", color: "primary"),
+                  MyText.p(context: context, text: ecommerce?.type_ecommerce ?? "", color: "primary"),
                 ]),
             InkWell(
               child: CircleAvatar(
@@ -125,6 +131,17 @@ class _HomeState extends State<HomeScreen> {
     ),
   );
 
+  Widget _loading() => Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text("Cargando información"),
+        SizedBox(height: 10),
+        CircularProgressIndicator()
+      ],
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -132,15 +149,35 @@ class _HomeState extends State<HomeScreen> {
         child: Scaffold(
             appBar: DefaultAppBar(),
             body: SafeArea(
-              child: Column(
-                children: <Widget>[
-                  _header,
-                  SizedBox(height: 10),
-                  _balance,
-                  SizedBox(height: 20),
-                  _products
-                ],
-              ),
+              child: BlocConsumer<HomeScreenBloc, HomeScreenState>(
+                bloc: _bloc,
+                listener: (context, state) {
+
+                },
+                builder: (context, state) {
+                  print(state);
+
+                  if(state is HomeScreenInitialState || state is HomeScreenLoadingState){
+                    return _loading();
+                  }
+                  if(state is HomeScreenSuccessState){
+                    return Column(
+                      children: <Widget>[
+                        _header(ecommerce: state.ecommerce),
+                        SizedBox(height: 10),
+                        // _balance,
+                        SizedBox(height: 20),
+                        _products
+                      ],
+                    );
+                  }
+                  if(state is HomeScreenErrorState){
+                    return Center(child: Text(state.errorMessage ?? "Error al cargar la información"));
+                  }
+                  return Center(child: Text("Error al cargar la información 2"));
+
+              },
+),
             )
         ),
     );
